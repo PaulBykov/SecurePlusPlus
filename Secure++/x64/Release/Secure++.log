@@ -1,4 +1,0 @@
-﻿  Secure.cpp
-D:\konferenzia\Secure++\Secure.cpp(470,41): warning C4267: инициализация: преобразование из "size_t" в "uint32_t"; возможна потеря данных
-D:\konferenzia\Secure++\Secure.cpp(516,11): warning C4267: =: преобразование из "size_t" в "uint32_t"; возможна потеря данных
-  Secure++.vcxproj -> D:\konferenzia\Secure++\x64\Release\Secure++.lib
