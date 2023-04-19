@@ -10,17 +10,12 @@ namespace Secure {
 	class FileWriteException;
 	class LocalisationException;
 
-	// øèôğ ôàéëîâ
+
 	void fileEncrypt(std::string fileName, std::string newFileName = "");
 	void fileDecrypt(std::string fileName, std::string newFileName = "");
 
-    // ïğîñòûå øèôğû
-    std::string ñaesarEncrypt(std::string text, int key, std::string localisation = "eng");
+    std::string ñaesarÑrypt(std::string text, int key, std::string localisation = "eng");
     std::string XOR(std::string text, char key);
-    std::string vigenereEncrypt(std::string plaintext, std::string key);
-    std::string vigenereDecrypt(std::string plaintext, std::string key);
-
-    //sha256
 
 	std::string sha256(const std::string& message);
 

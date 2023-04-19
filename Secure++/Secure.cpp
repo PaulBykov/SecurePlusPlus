@@ -22,8 +22,6 @@ namespace Secure {
 		{"rus" , {"абвгдеЄжзийклмнопрстуфхцчшщъыьэю€", "јЅ¬√ƒ≈®∆«»… ЋћЌќѕ–—“”‘’÷„ЎўЏџ№Ёёя"}}
 	};
 
-	// исключени€:
-
 	class FileOpenException : public std::exception {
 	public:
 		FileOpenException(const std::string& fileName) : fileName_(fileName) {}
@@ -71,14 +69,8 @@ namespace Secure {
 		std::string fileName_;
 	};
 
-	// 2 костыл€ нужны дл€ fileEncrypt и fileDecrypt определ€ютс€ при binaryRead(), чтобы не увеличивать кол-во
-	// аргументов этой функции сделал глобальными (btw пришлось бы их определ€ть в скопе 2-х методов, поэтому оправданно)
 	std::streamsize size;
 	char* in;
-
-
-	// методы:
-
 
 	void binaryRead(std::string& fileName, std::string& fileFormat) {
 
@@ -89,9 +81,9 @@ namespace Secure {
 		}
 
 		size = inputFile.tellg();
-		inputFile.seekg(0, std::ios::beg);  // возвращаем указатель в начало файла
+		inputFile.seekg(0, std::ios::beg);
 
-		in = new char[size]; // WARNING! ћб умный указатель будет лучше
+		in = new char[size];
 		if (!inputFile.read(in, size)) {
 			throw FileReadException(fileName + fileFormat);
 		}
@@ -115,17 +107,14 @@ namespace Secure {
 
 
 	std::string getFileFormat(std::string& fileName) {
-		// after this method fileName would contain only name of file (before ".")
-		// returning value will become everything after "." (including dot)
-
 		std::string fileFormat;
 
 		for (int i = 0; i < fileName.size(); i++) {
 			if (fileName[i] == *".") {
 				for (int j = i; j < fileName.size(); j++) {
-					fileFormat.push_back(fileName[j]); // записываем формат файла = точка и все после неЄ
+					fileFormat.push_back(fileName[j]);
 				}
-				fileName.erase(i); // удал€ем точку и до конца строки
+				fileName.erase(i);
 			}
 		}
 
@@ -141,7 +130,6 @@ namespace Secure {
 			newFileName = fileName + CRYPTED_PREFIX + fileFormat;
 		else
 			newFileName += fileFormat;
-		// т.к. им€ динамическое -> нельз€ поставить как по умолчанию
 
 
 		binaryRead(fileName, fileFormat);
@@ -163,7 +151,6 @@ namespace Secure {
 			newFileName = fileName + DECRYPTED_PREFIX + fileFormat;
 		else
 			newFileName += fileFormat;
-		// т.к. им€ динамическое -> нельз€ поставить по умолчанию, поэтому костыль
 
 		binaryRead(fileName, fileFormat);
 
@@ -176,8 +163,6 @@ namespace Secure {
 		delete[] in;
 	}
 
-	// зр€ € так писал, встроенные методы строк были бы круче, € чет уже не соображаю 
-	// Ќјƒќ ƒЋя ÷≈«ј–я (салат)
 	int index(char s1, std::string s2) { // возв. индекс первого вхождени€ s1 в s2
 		for (int i = 0; i < s2.size(); i++) {
 			if (s2[i] == s1) {
@@ -188,7 +173,7 @@ namespace Secure {
 		return -1;
 	}
 
-	std::string сaesarEncrypt(std::string text, int key, std::string localisation) {
+	std::string сaesar—rypt(std::string text, int key, std::string localisation) {
 		std::string alphabet;
 		std::string alphabetCapitalized;
 		std::string newText = text;
@@ -225,60 +210,6 @@ namespace Secure {
 		return result;
 	}
 
-	std::string vigenereEncrypt(std::string plaintext, std::string key)
-	{
-		std::string ciphertext = "";
-		int key_index = 0;
-		for (char& c : plaintext)
-		{
-			if (isalpha(c))
-			{
-				int shift = tolower(key[key_index % key.length()]) - 'a';
-				if (isupper(c))
-				{
-					ciphertext += (c - 'A' + shift) % 26 + 'A';
-				}
-				else
-				{
-					ciphertext += (c - 'a' + shift) % 26 + 'a';
-				}
-				key_index++;
-			}
-			else
-			{
-				ciphertext += c;
-			}
-		}
-		return ciphertext;
-	}
-
-	std::string vigenereDecrypt(std::string ciphertext, std::string key)
-	{
-		std::string plaintext = "";
-		int key_index = 0;
-		for (char& c : ciphertext)
-		{
-			if (isalpha(c))
-			{
-				int shift = tolower(key[key_index % key.length()]) - 'a';
-				if (isupper(c)) {
-					plaintext += (c - 'A' - shift + 26) % 26 + 'A';
-				}
-				else
-				{
-					plaintext += (c - 'a' - shift + 26) % 26 + 'a';
-				}
-				key_index++;
-			}
-			else
-			{
-				plaintext += c;
-			}
-		}
-		return plaintext;
-	}
-
-	// sha256:
 	constexpr uint32_t ROTL(uint32_t x, uint32_t n) {
 		return (x << n) | (x >> (32 - n));
 	}
@@ -337,7 +268,6 @@ namespace Secure {
 			0x90befffa, 0xa4506ceb, 0xbef9a3a1, 0x12ba9f31
 		};
 
-		// Step 1: Pad the input message
 		uint64_t messageLength = message.size() * 8;
 		size_t numBlocks = ((message.size() + 8) / 64) + 1;
 		size_t paddedLength = numBlocks * 64;
@@ -349,7 +279,6 @@ namespace Secure {
 		for (size_t i = 0; i < 8; i++)
 			paddedMessage[paddedLength - 8 + i] = (messageLength >> (56 - i * 8)) & 0xff;
 
-		// Step 2: Initialize hash values
 		uint32_t h0 = 0x6a09e667;
 		uint32_t h1 = 0xbb67ae85;
 		uint32_t h2 = 0x3c6ef372;
@@ -359,7 +288,6 @@ namespace Secure {
 		uint32_t h6 = 0x1f83d9ab;
 		uint32_t h7 = 0x5be0cd19;
 
-		// Step 3: Process message in 512-bit blocks
 		for (size_t i = 0; i < numBlocks; i++) {
 			uint32_t w[64];
 			for (size_t j = 0; j < 16; j++)
@@ -402,7 +330,6 @@ namespace Secure {
 			h7 += h;
 		}
 
-		// Step 4: Output the hash value
 		std::ostringstream oss;
 		oss << std::hex << std::setfill('0') << std::setw(8) << h0
 			<< std::setw(8) << h1
@@ -413,13 +340,10 @@ namespace Secure {
 			<< std::setw(8) << h6
 			<< std::setw(8) << h7;
 
-		// Step 5: Clean up
 		delete[] paddedMessage;
 
 		return oss.str();
 	}
-
-	// md5:
 	
 	const uint32_t s[64] = 
 	{
